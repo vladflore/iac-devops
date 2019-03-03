@@ -1,0 +1,4 @@
+.idea/
+.vagrant/
+jenkins_home/
+*.log
