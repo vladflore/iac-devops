@@ -1,4 +1,4 @@
-FROM jenkins:latest
+FROM jenkins/jenkins:lts
 USER root
 
 ENV JENKINS_HOME /var/lib/jenkins
