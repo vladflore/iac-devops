@@ -5,6 +5,17 @@
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
+
+
+
+$script = <<-SCRIPT
+echo Restricting permission for private key file...
+chmod 400 ~/.ssh/id_rsa
+SCRIPT
+
+
+
+
 Vagrant.configure("2") do |config|
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
@@ -69,10 +80,15 @@ Vagrant.configure("2") do |config|
   # SHELL
 
   #########################################################################################
-  config.vm.provider :virtualbox do
-      unless Vagrant.has_plugin?("vagrant-vbguest")
-        raise "The vagrant-vbguest plugin is not installed. Run `vagrant plugin install vagrant-vbguest` then try again."
-      end
+
+    config.vm.provider 'virtualbox' do |vb|
+      vb.name = 'jenkins-running-in-docker'
+      vb.cpus = 2
+      vb.memory = 4096
+    end
+
+    unless Vagrant.has_plugin?("vagrant-vbguest")
+        raise 'The Vagrant VBGuest plugin must be install prior to building this VM (vagrant plugin install vagrant-vbguest)'
     end
 
     config.vm.box = "ubuntu/xenial64"
@@ -85,6 +101,10 @@ Vagrant.configure("2") do |config|
       docker.build_image dockerfiles_dir, args: "-f #{dockerfiles_dir}/jenkins_docker -t jenkins/docker --build-arg DOCKER_GROUP_ID=$(getent group docker | cut -d: -f3)"
       docker.run "jenkins/docker", args: "-p 8080:8080 -p 50000:50000 -v #{jenkins_dir}:#{jenkins_dir} -v #{docker_sock_path}:#{docker_sock_path} -v $(which docker):/usr/bin/docker"
     end
+
+    # TODO how to change the file permission to 400 ?
+    config.vm.provision "file", source: "C:\\Users\\Vlad\\.ssh\\id_rsa", destination: "~/.ssh/id_rsa"
+    # config.vm.provision "shell", inline: $script
 
     config.vm.network "forwarded_port", guest: 8080, host: 8980
 
