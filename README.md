@@ -42,6 +42,61 @@ More: ```https://github.com/jenkinsci/docker```
     * TODO: after `docker run` do `docker logs -f <container_id>`, where `container_id` comes from the previous command
 * reset password by running `docker exec <container_name> ./setPassword.sh <your_password>`
 
+# Oracle XE database in Docker
+```
+cd /home/vlad/vladflore.dev/sandbox/docker-images/OracleDatabase/SingleInstance/dockerfiles
+./buildDockerImage.sh -v 11.2.0.2 -x
+```
+* Go [here](https://github.com/oracle/docker-images/tree/master/OracleDatabase/SingleInstance#running-oracle-database-11gr2-express-edition-in-a-docker-container)
+```
+docker volume create odb-xe-11202
+docker run --name odb-xe-11202 \
+--shm-size=1g \
+-p 1521:1521 -p 8080:8080 \
+-e ORACLE_PWD=welcome1 \
+-v odb-xe-11202:/u01/app/oracle/oradata \
+oracle/database:11.2.0.2-xe
+```
+
+
+
+
+
+
+
+
+
+
+
+
+```
+docker login
+docker run -d -it --name <Oracle-DB> store/oracle/database-enterprise:12.2.0.1
+docker ps
+docker exec -it <Oracle-DB> bash -c "source /home/oracle/.bashrc; sqlplus /nolog"
+docker run -d -it --name <Oracle-DB> -P store/oracle/database-enterprise:12.2.0.1
+docker port <Oracle-DB>
+
+ORCLCDB=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=<ip-address of host>)(PORT=<mapped host port>))
+    (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ORCLCDB.localdomain)))
+ORCLPDB1=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=<ip-address> of host)(PORT=<mapped host port>))
+    (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ORCLPDB1.localdomain)))
+
+sqlplus sys/Oradoc_db1@ORCLCDB as sysdba
+
+alter user sys identified by <new-password>;
+
+docker logs <Oracle-DB>
+
+docker run -d -it --name <Oracle-DB> -v OracleDBData:/ORCL store/oracle/database-enterprise:12.2.0.1
+
+docker run -d -it --name <Oracle-DB> -v /data/OracleDBData:/ORCL store/oracle/database-enterprise:12.2.0.1
+
+docker run -d -it --name <Oracle-DB> store/oracle/database-enterprise:12.2.0.1-slim
+```
+
+[docker hub](https://hub.docker.com/u/vladflore/content/sub-49361cea-8599-463d-b3cd-bf5d4f428420) 
+ 
  
 # Install sqldeveloper on ubuntu
 * go to [link](https://www.oracle.com/tools/downloads/sqldev-v192-downloads.html)
